@@ -48,13 +48,11 @@ def generate_random_route(city_list):
 def get_pheromone_trails(city_list):
     return {first_city: {second_city: 1 for second_city in city_list if second_city > first_city} for first_city in city_list if first_city < len(city_list)-1}
 
-def decay_pheromones(pheromone_trails: dict[int: dict], decay_coefficient: float):
-    for start_city, destination_cities in pheromone_trails:
-        for k, destination_city in destination_cities:
-            destination_city = destination_city * decay_coefficient
-
-
-
+def decay_pheromones(pheromone_trails: dict, decay_coefficient: float):
+    for start_city in pheromone_trails:
+        for destination_city in pheromone_trails[start_city]:
+            pheromone_trails[start_city][destination_city] = pheromone_trails[start_city][destination_city] * decay_coefficient
+            
 
 ## ======================================================================
 ## Program Run
