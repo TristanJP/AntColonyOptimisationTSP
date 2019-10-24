@@ -92,24 +92,79 @@ def greedy_construct_route(cities_map, city_list: list):
 
     return greedy_route
 
+def get_cities_probability_list(cities_map, city_list, pheromone_trails, current_city, possible_cities):
+    # NEEDS WORK
+
+    alpha = 1
+    beta = 1
+
+    value = lambda alpha, beta, cities : math.pow(pheromone_trails[cities[0]][cities[1]], alpha) * (1/math.pow(get_cost_between_cities(cities_map, current_city, city), beta))
+
+    my_dict = {city: 0 for city in city_list if not current_city}
+    for city in city_list:
+        if city == current_city: 
+            my_dict[city] = 0 
+            continue
+        cities = [current_city, city]
+        cities.sort()
+        my_dict[city] = value(alpha, beta, cities)
+        if city not in possible_cities:
+            my_dict[city] = 0
+    return my_dict
+
+def ant_choose_city(cities_map, city_list, pheromone_trails, current_city, visited_cities):
+    possible_cities = [city for city in city_list if city not in visited_cities]
+
+    city_probabilities = get_cities_probability_list(cities_map, city_list, pheromone_trails, current_city, possible_cities)
+
+    running_total = 0
+    for city, probability in city_probabilities.items():
+        running_total += probability
+        city_probabilities[city] = running_total
+
+    i = random.random() * city_probabilities[len(city_probabilities)-1]
+
+    next_city = 0
+    for city in city_probabilities:
+        if i <= city_probabilities[city]:
+            next_city = city
+            break
+
+    return city
+
+def ant_construct_route(cities_map, city_list, pheromone_trails):
+    new_route = []
+    start = random.choice(city_list)
+    new_route.append(start)
+    i = 0
+    while i < len(city_list) -1:
+        new_route.append(ant_choose_city(cities_map,city_list,pheromone_trails,new_route[-1],new_route))
+        i+= 1
+    
+    return new_route
+
+def ant_search(cities_map, city_list, pheromone_trails, steps):
+    i = 0
+    while i < steps:
+        route = ant_construct_route(cities_map, city_list, pheromone_trails)
+        decay_pheromones(pheromone_trails, 0.5)
+        update_pheromones_for_route(cities_map,pheromone_trails,route,1)
+        i += 1
+    return route
 ## ======================================================================
 ## Program Run
 start_time = time.time()
 
 cities_map = get_cities_from_file("../TravellingSalesman/ulysses16(1).csv")
 city_list = get_list_of_cities(cities_map)
+pheromone_trails = get_pheromone_trails(city_list)
 
-# pheromone_trails = get_pheromone_trails([0,1,2,3])
+route = ant_search(cities_map,city_list,pheromone_trails,1000)
 
-# print(pheromone_trails)
-
-# update_pheromones_for_route(cities_map, pheromone_trails, [0,1,3,2], 8)
-
-# print(pheromone_trails)
-
-route = greedy_construct_route(cities_map, city_list)
 print(route)
 print(get_cost_of_route(route, cities_map))
+print()
+print(pheromone_trails)
 
 
 ## Program End
