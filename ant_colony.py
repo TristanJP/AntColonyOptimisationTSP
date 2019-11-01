@@ -151,6 +151,7 @@ def ant_search(cities_map, city_list, pheromone_trails, steps):
         update_pheromones_for_route(cities_map,pheromone_trails,route,1)
         i += 1
     return route
+
 ## ======================================================================
 ## Program Run
 start_time = time.time()
@@ -163,9 +164,6 @@ route = ant_search(cities_map,city_list,pheromone_trails,1000)
 
 print(route)
 print(get_cost_of_route(route, cities_map))
-print()
-print(pheromone_trails)
-
 
 ## Program End
 end_time = time.time()
