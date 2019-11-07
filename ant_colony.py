@@ -144,11 +144,12 @@ def ant_construct_route(cities_map, city_list, pheromone_trails):
     return new_route
 
 def ant_search(cities_map, city_list, pheromone_trails, steps):
-    i = 0
-    while i < steps:
+    i = 1
+    while i <= steps:
         route = ant_construct_route(cities_map, city_list, pheromone_trails)
         decay_pheromones(pheromone_trails, 0.5)
         update_pheromones_for_route(cities_map,pheromone_trails,route,1)
+        print(f"{i}: {route} ({get_cost_of_route(route, cities_map)})")
         i += 1
     return route
 
